@@ -43,7 +43,7 @@ def face_detector(frame, face_detection_model):
     #for every detection
     for i in range(0, detections.shape[2]):
         confidence = detections[0,0,i,2] #this is for this type of nnet output
-        if confidence > args["conf"]:
+        if confidence > float(args["conf"]):
             #get the bounding box coordinates (4 corners) and scales it to the img size
             (x0,y0,x1,y1) = (detections[0,0,i,3:7]*np.array([w,h,w,h])).astype(int)
             #we need to ensure that any point could be outside the pictures frame
@@ -97,3 +97,23 @@ if args["mode"] == "video":
     #finish up
     cv2.destroyAllWindows()
     video.stop()
+
+if args["mode"] == "image":
+    print("[INFO] Leyendo imagen")
+    try:
+        image = cv2.imread(os.path.join(os.getcwd(), args["input"]))
+        image = cv2.resize(image, (600,400))
+
+        (locations) = face_detector(image, face_detection_model)
+
+        for (x0, y0, x1, y1) in locations:
+            cv2.rectangle(image, (x0,y0), (x1,y1), (0, 255, 0), 2)
+
+        cv2.imshow("Face detector", image)
+        cv2.waitKey(0)
+
+    except:
+        print("[!Error] No se puede leer la imagen en la ruta {}".format(os.path.join(os.getcwd(), args["input"])))
+
+    #finish up
+    cv2.destroyAllWindows()
